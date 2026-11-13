@@ -56,6 +56,18 @@ together with the change that caused it, and mention the size difference in the 
 The project has no test suite beyond lint, type-check and the schema validation in
 `percli plugin build`. If you want to add tests, raise it in an issue first.
 
+## Releasing
+
+1. Set the version in `package.json` and `package-lock.json` (`npm version <X.Y.Z> --no-git-tag-version`),
+   move the `Unreleased` entries in `CHANGELOG.md` under it, and merge that to `main`.
+2. Push a signed or annotated tag `v<X.Y.Z>` on that commit. A prerelease tag (`v<X.Y.Z>-rc.1`) works
+   the same way and is published as a GitHub prerelease.
+3. The `release` workflow checks that the tag matches `package.json`, builds `Geomap-<version>.tar.gz`
+   with `percli plugin build`, attaches it and its `.sha256` to the GitHub release, and pushes
+   `ghcr.io/astrona-io/perses-plugin-geomap:<tag>` for linux/amd64 and linux/arm64, with build provenance
+   attestations for both.
+4. Write the release notes on the GitHub release: the workflow leaves them empty.
+
 ## Pull requests
 
 - Keep each pull request to one change, and describe what you checked.

@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-13
+
+### Added
+
+- Releases are built on GitHub: a tag `v<version>` publishes the plugin archive and its checksum on
+  the GitHub release and the plugin image as `ghcr.io/astrona-io/perses-plugin-geomap:v<version>` (linux/amd64 and
+  linux/arm64), with build provenance attestations.
+
 ## [0.2.0] - 2026-11-13
 
 ### Added
