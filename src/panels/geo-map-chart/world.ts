@@ -19,7 +19,17 @@ let registered = false;
 let knownCodes: Set<string> | undefined;
 /** English name per code, from the geo data's `properties.name` (baked in at build time). */
 const geoNames = new Map<string, string>();
-let bounds = { minLon: -180, maxLon: 180, minLat: -60, maxLat: 85 };
+let bounds: Bounds = { minLon: -180, maxLon: 180, minLat: -60, maxLat: 85 };
+/** Unwrapped geometry per code, for zooming to a country. */
+const geometries = new Map<string, Geometry>();
+const regionBoundsCache = new Map<string, Bounds | null>();
+
+export interface Bounds {
+  minLon: number;
+  maxLon: number;
+  minLat: number;
+  maxLat: number;
+}
 
 type Ring = number[][];
 
@@ -53,28 +63,91 @@ function unwrapGeometry(geometry: Geometry): Geometry {
   return geometry;
 }
 
-function computeBounds(features: Feature[]): typeof bounds {
-  const b = {
+function emptyBounds(): Bounds {
+  return {
     minLon: Infinity,
     maxLon: -Infinity,
     minLat: Infinity,
     maxLat: -Infinity,
   };
-  const visit = (ring: Ring): void => {
-    for (const [lon, lat] of ring) {
-      b.minLon = Math.min(b.minLon, lon!);
-      b.maxLon = Math.max(b.maxLon, lon!);
-      b.minLat = Math.min(b.minLat, lat!);
-      b.maxLat = Math.max(b.maxLat, lat!);
-    }
-  };
-  for (const f of features) {
-    const g = f.geometry;
-    if (g.type === "Polygon") g.coordinates.forEach(visit);
-    if (g.type === "MultiPolygon")
-      g.coordinates.forEach((p) => p.forEach(visit));
+}
+
+function extend(b: Bounds, ring: Ring): Bounds {
+  for (const [lon, lat] of ring) {
+    b.minLon = Math.min(b.minLon, lon!);
+    b.maxLon = Math.max(b.maxLon, lon!);
+    b.minLat = Math.min(b.minLat, lat!);
+    b.maxLat = Math.max(b.maxLat, lat!);
   }
   return b;
+}
+
+function polygonsOf(g: Geometry): Ring[][] {
+  if (g.type === "Polygon") return [g.coordinates];
+  if (g.type === "MultiPolygon") return g.coordinates;
+  return [];
+}
+
+function computeBounds(features: Feature[]): Bounds {
+  const b = emptyBounds();
+  for (const f of features)
+    for (const polygon of polygonsOf(f.geometry))
+      polygon.forEach((r) => extend(b, r));
+  return b;
+}
+
+/** Rough area of a ring in km²-like units: shoelace in degrees, scaled by cos(latitude). */
+function ringArea(ring: Ring): number {
+  let sum = 0;
+  let lat = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const [x1, y1] = ring[i]!;
+    const [x2, y2] = ring[(i + 1) % ring.length]!;
+    sum += x1! * y2! - x2! * y1!;
+    lat += y1!;
+  }
+  return Math.abs(sum / 2) * Math.cos(((lat / ring.length) * Math.PI) / 180);
+}
+
+/** Polygons below this share of the largest one are left out of a country's zoom box. */
+const MAIN_LAND_SHARE = 0.2;
+
+/**
+ * The part of a country worth zooming to: the box around its main land masses. Small outlying
+ * islands and overseas territories (French Guiana, Svalbard, Attu) would otherwise make the box
+ * span half the world. When even the main land masses span more than 180° of longitude, only the
+ * largest polygon is used.
+ */
+export function regionBounds(code: string): Bounds | undefined {
+  ensureWorldMap();
+  const cached = regionBoundsCache.get(code);
+  if (cached !== undefined) return cached ?? undefined;
+  const geometry = geometries.get(code);
+  let result: Bounds | null = null;
+  if (geometry) {
+    const polygons = polygonsOf(geometry)
+      .filter((p) => p[0] && p[0].length > 2)
+      .map((p) => ({ outer: p[0]!, area: ringArea(p[0]!) }))
+      .sort((a, b) => b.area - a.area);
+    if (polygons.length) {
+      const largest = polygons[0]!.area;
+      const main = emptyBounds();
+      for (const p of polygons)
+        if (p.area >= largest * MAIN_LAND_SHARE) extend(main, p.outer);
+      result =
+        main.maxLon - main.minLon > 180
+          ? extend(emptyBounds(), polygons[0]!.outer)
+          : main;
+    }
+  }
+  regionBoundsCache.set(code, result);
+  return result ?? undefined;
+}
+
+/** Bounding box of the whole map (unwrapped lon/lat), as ECharts lays it out. */
+export function worldBounds(): Bounds {
+  ensureWorldMap();
+  return bounds;
 }
 
 /** Width / height of the drawn map, as ECharts lays it out (aspectScale included). */
@@ -121,6 +194,9 @@ function buildFeatures(): FeatureCollection {
 export function ensureWorldMap(): void {
   if (registered && getMap(WORLD_MAP_NAME)) return;
   const collection = buildFeatures();
+  geometries.clear();
+  regionBoundsCache.clear();
+  for (const f of collection.features) geometries.set(String(f.id), f.geometry);
   knownCodes = new Set(collection.features.map((f) => String(f.id)));
   bounds = computeBounds(collection.features);
   // ECharts' typings expect its own GeoJSON shape; the standard one is what it parses.
@@ -129,6 +205,12 @@ export function ensureWorldMap(): void {
     collection as unknown as Parameters<typeof registerMap>[1],
   );
   registered = true;
+}
+
+/** Every code that has a shape on the map. */
+export function mapCodes(): string[] {
+  ensureWorldMap();
+  return [...(knownCodes ?? [])];
 }
 
 export function isOnMap(code: string): boolean {

@@ -12,12 +12,17 @@ import { CalculationSelector } from "@perses-dev/plugin-system";
 import {
   COLOR_SCHEME_LABELS,
   ColorScheme,
+  DEFAULT_CITY_LABEL,
   DEFAULT_COLOR_SCHEME,
   DEFAULT_COUNTRY_LABEL,
+  DEFAULT_LATITUDE_LABEL,
+  DEFAULT_LONGITUDE_LABEL,
   DEFAULT_SCALE,
+  DEFAULT_SHOW_CITIES,
   GeoMapChartEditorProps,
   GeoMapChartOptions,
   ScaleType,
+  ShowCities,
 } from "./geo-map-chart-types";
 
 const DEFAULT_FORMAT: FormatOptions = { unit: "decimal" };
@@ -58,6 +63,62 @@ export function GeoMapChartSettingsEditor(
               />
             }
           />
+        </OptionsEditorGroup>
+        <OptionsEditorGroup title="Cities">
+          <OptionsEditorControl
+            label="Show cities"
+            description="Series with coordinate labels are drawn as points. Auto: once zoomed in, or always when there are only points"
+            control={
+              <TextField
+                select
+                size="small"
+                value={value.showCities ?? DEFAULT_SHOW_CITIES}
+                onChange={(e) =>
+                  set({ showCities: e.target.value as ShowCities })
+                }
+              >
+                <MenuItem value="auto">Auto</MenuItem>
+                <MenuItem value="always">Always</MenuItem>
+                <MenuItem value="never">Never (add to country)</MenuItem>
+              </TextField>
+            }
+          />
+          {(
+            [
+              [
+                "cityLabel",
+                "City label",
+                DEFAULT_CITY_LABEL,
+                "Label with the place name",
+              ],
+              [
+                "latitudeLabel",
+                "Latitude label",
+                DEFAULT_LATITUDE_LABEL,
+                "Label with the latitude in decimal degrees",
+              ],
+              [
+                "longitudeLabel",
+                "Longitude label",
+                DEFAULT_LONGITUDE_LABEL,
+                "Label with the longitude in decimal degrees",
+              ],
+            ] as const
+          ).map(([key, label, placeholder, description]) => (
+            <OptionsEditorControl
+              key={key}
+              label={label}
+              description={description}
+              control={
+                <TextField
+                  size="small"
+                  placeholder={placeholder}
+                  value={value[key] ?? ""}
+                  onChange={(e) => set({ [key]: e.target.value || undefined })}
+                />
+              }
+            />
+          ))}
         </OptionsEditorGroup>
         <OptionsEditorGroup title="Format">
           <FormatControls
@@ -132,6 +193,28 @@ export function GeoMapChartSettingsEditor(
               <Switch
                 checked={value.showLegend ?? true}
                 onChange={(_, showLegend) => set({ showLegend })}
+              />
+            }
+          />
+        </OptionsEditorGroup>
+        <OptionsEditorGroup title="Zoom">
+          <OptionsEditorControl
+            label="Zoom and pan"
+            description="Mouse wheel or pinch to zoom, drag to pan, and the zoom buttons"
+            control={
+              <Switch
+                checked={value.zoom ?? true}
+                onChange={(_, zoom) => set({ zoom })}
+              />
+            }
+          />
+          <OptionsEditorControl
+            label="Click to zoom"
+            description="Click a country to zoom to it; click it again or the sea to zoom out"
+            control={
+              <Switch
+                checked={value.clickToZoom ?? true}
+                onChange={(_, clickToZoom) => set({ clickToZoom })}
               />
             }
           />

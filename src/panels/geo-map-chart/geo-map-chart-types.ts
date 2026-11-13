@@ -14,6 +14,8 @@ export type GeoMapChartEditorProps = OptionsEditorProps<GeoMapChartOptions>;
 export type ColorScheme =
   "blues" | "greens" | "oranges" | "purples" | "reds" | "viridis";
 export type ScaleType = "linear" | "log";
+/** When the city layer is drawn: `auto` once zoomed in (or always when there are only cities). */
+export type ShowCities = "auto" | "always" | "never";
 
 export interface GeoMapChartOptions {
   /** How each series is reduced to one value. */
@@ -30,11 +32,27 @@ export interface GeoMapChartOptions {
   max?: number;
   /** Show the colour scale under the map. Default true. */
   showLegend?: boolean;
+  /** Mouse-wheel / pinch zoom, drag to pan and the zoom buttons. Default true. */
+  zoom?: boolean;
+  /** Clicking a country zooms to it; clicking it again or the sea zooms back out. Default true. */
+  clickToZoom?: boolean;
+  /** Series label with a city (or place) name, for series drawn as points. Default `city`. */
+  cityLabel?: string;
+  /** Series label with the latitude in decimal degrees. Default `latitude`. */
+  latitudeLabel?: string;
+  /** Series label with the longitude in decimal degrees. Default `longitude`. */
+  longitudeLabel?: string;
+  /** When series with coordinates are drawn as points. Default `auto`. */
+  showCities?: ShowCities;
 }
 
 export const DEFAULT_COUNTRY_LABEL = "country";
 export const DEFAULT_COLOR_SCHEME: ColorScheme = "blues";
 export const DEFAULT_SCALE: ScaleType = "linear";
+export const DEFAULT_CITY_LABEL = "city";
+export const DEFAULT_LATITUDE_LABEL = "latitude";
+export const DEFAULT_LONGITUDE_LABEL = "longitude";
+export const DEFAULT_SHOW_CITIES: ShowCities = "auto";
 
 export function createInitialGeoMapChartOptions(): GeoMapChartOptions {
   return {
@@ -44,6 +62,8 @@ export function createInitialGeoMapChartOptions(): GeoMapChartOptions {
     colorScheme: DEFAULT_COLOR_SCHEME,
     scale: DEFAULT_SCALE,
     showLegend: true,
+    zoom: true,
+    clickToZoom: true,
   };
 }
 

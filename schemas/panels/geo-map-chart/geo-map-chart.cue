@@ -16,4 +16,14 @@ spec: close({
 	min?:          number
 	max?:          number
 	showLegend?:   bool
+	// Mouse-wheel / pinch zoom, drag to pan and the zoom buttons. Default true.
+	zoom?: bool
+	// Click a country to zoom to it; click it again or the sea to zoom out. Default true.
+	clickToZoom?: bool
+	// Labels of series drawn as points (cities). Coordinates are decimal degrees.
+	cityLabel?:      string & =~"^[a-zA-Z_][a-zA-Z0-9_]*$"
+	latitudeLabel?:  string & =~"^[a-zA-Z_][a-zA-Z0-9_]*$"
+	longitudeLabel?: string & =~"^[a-zA-Z_][a-zA-Z0-9_]*$"
+	// When points are drawn: auto (once zoomed in, or when there are only points), always, never.
+	showCities?: "auto" | "always" | "never"
 })
