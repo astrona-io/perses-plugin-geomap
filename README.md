@@ -23,6 +23,7 @@ Zoomed in on Europe, with a city layer:
 
 | Plugin | Perses | Status |
 | --- | --- | --- |
+| 0.2.x | v0.54.x | Tested with v0.54.0 |
 | 0.1.x | v0.54.x | Tested with v0.54.0 |
 
 The plugin is built against `@perses-dev/*` 0.54 and `percli` v0.54.0. Other Perses minor versions may
@@ -166,7 +167,7 @@ CUE dependencies into the archive.
 npm ci
 npm run lint && npm run type-check
 npm run build                 # module-federation bundle in dist/
-percli plugin build           # validates the schema, writes Geomap-0.1.0.tar.gz
+percli plugin build           # validates the schema, writes Geomap-0.2.0.tar.gz
 ```
 
 `npm run dev` serves the plugin for `percli plugin start` against a running Perses. See
@@ -205,14 +206,14 @@ Download `Geomap-<version>.tar.gz` from the
 Perses can read, and add that directory to the config:
 
 ```bash
-curl -fLO https://github.com/astrona-io/perses-plugin-geomap/releases/download/v0.1.0/Geomap-0.1.0.tar.gz
+curl -fLO https://github.com/astrona-io/perses-plugin-geomap/releases/download/v0.2.0/Geomap-0.2.0.tar.gz
 ```
 
 ```yaml
 plugin:
   archive_paths:
     - /etc/perses/plugins-archive        # plugins bundled with Perses
-    - /etc/perses/plugins-archive-extra  # put Geomap-0.1.0.tar.gz here
+    - /etc/perses/plugins-archive-extra  # put Geomap-0.2.0.tar.gz here
 ```
 
 ### Option B: Kubernetes image volume
@@ -254,7 +255,7 @@ directory is in the default `archive_paths`:
 
 ```dockerfile
 FROM persesdev/perses:v0.54.0
-COPY Geomap-0.1.0.tar.gz /etc/perses/plugins-archive/
+COPY Geomap-0.2.0.tar.gz /etc/perses/plugins-archive/
 ```
 
 ## Licences and credits

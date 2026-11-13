@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-13
+
 ### Added
 
 - Zoom and pan with the mouse wheel, a pinch or a drag (1x to 20x), and zoom in, zoom out and reset
@@ -18,6 +20,8 @@ All notable changes to this project are documented here. The format follows
   `showCities` (`auto`, `always`, `never`; default `auto`). Points with invalid coordinates are listed
   under the map.
 - The view survives data refreshes and theme switches.
+
+Tested with Perses v0.54.0.
 
 ## [0.1.0] - 2026-11-13
 
@@ -37,5 +41,6 @@ All notable changes to this project are documented here. The format follows
 
 Tested with Perses v0.54.0.
 
-[Unreleased]: https://github.com/astrona-io/perses-plugin-geomap/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/astrona-io/perses-plugin-geomap/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/astrona-io/perses-plugin-geomap/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/astrona-io/perses-plugin-geomap/releases/tag/v0.1.0

@@ -7,7 +7,7 @@
 #
 # See "Install into Perses" in README.md.
 FROM scratch
-ARG VERSION=0.1.0
+ARG VERSION=0.2.0
 COPY Geomap-${VERSION}.tar.gz /
 LABEL org.opencontainers.image.title="perses-plugin-geomap" \
       org.opencontainers.image.description="Perses GeoMapChart panel plugin archive (for an image volume)" \
