@@ -1,0 +1,20 @@
+perses-plugin-geomap
+Copyright 2026 Astrona
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It includes or is built from the following third-party material:
+
+- Natural Earth 1:50m Admin 0 countries (https://www.naturalearthdata.com).
+  Public domain. Simplified and re-keyed in src/data/world-countries.json.
+- world-atlas (https://github.com/topojson/world-atlas), the TopoJSON
+  conversion of Natural Earth used as the build input.
+  ISC License, Copyright 2013-2019 Michael Bostock.
+- topojson-client (https://github.com/topojson/topojson-client), bundled.
+  ISC License, Copyright 2012-2019 Michael Bostock.
+- Country names from the Unicode CLDR, through Node.js ICU, baked into
+  src/data/world-countries.json. Unicode License v3, Copyright 1991-2026
+  Unicode, Inc.
+- Perses shared CUE schemas (https://github.com/perses/shared), vendored into
+  the plugin archive at build time. Apache License 2.0, Copyright The Perses
+  Authors.

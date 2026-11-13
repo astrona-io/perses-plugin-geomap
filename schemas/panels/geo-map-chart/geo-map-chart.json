@@ -1,0 +1,14 @@
+{
+  "kind": "GeoMapChart",
+  "spec": {
+    "calculation": "last",
+    "countryLabel": "country",
+    "format": {
+      "unit": "decimal",
+      "decimalPlaces": 0
+    },
+    "colorScheme": "blues",
+    "scale": "log",
+    "showLegend": true
+  }
+}
