@@ -15,6 +15,10 @@ sum by (country) (increase(http_requests_total[$__range]))
 | --- | --- |
 | ![Light theme](docs/screenshot-light.jpg) | ![Settings editor](docs/screenshot-editor.jpg) |
 
+Zoomed in on Europe, with a city layer:
+
+![Zoomed in on Europe, with city points and a tooltip on Denmark](docs/screenshot-zoom.jpg)
+
 ## Supported versions
 
 | Plugin | Perses | Status |
@@ -38,6 +42,42 @@ work but are not tested; see [Why ECharts](#why-echarts) for the part most likel
 - The tooltip shows the country name and the formatted value. Codes that have no shape (`XX` for
   unknown, `T1` for Tor exit nodes as some CDNs report them, or anything unmatched) are listed under
   the map instead of being dropped.
+- The map zooms and pans, and clicking a country zooms to it. Series with coordinates can be drawn
+  as points (cities) on top of the countries. See [Zoom and cities](#zoom-and-cities).
+
+### Zoom and cities
+
+- **Zoom and pan** with the mouse wheel, a pinch or a drag, between 1x and 20x. The buttons at the top
+  right zoom in, zoom out and reset to the whole world.
+- **Click a country** to zoom to it. Click it again, click the sea or press reset to zoom back out. A
+  drag is never taken as a click. Small far-away islands are left out of the box it zooms to, so
+  France zooms to France, not to France and French Guiana.
+- Country names appear from 2x zoom, on countries large enough on screen.
+- The view survives a data refresh and a light/dark switch. It resets when the panel is edited.
+
+A series becomes a **point** instead of filling its country when it carries a `latitude` and a
+`longitude` label (decimal degrees; the label names are configurable). The `city` label names the
+point. Points are sized by value, use the same colour scale as the countries, and show their names
+from 4x zoom. With `showCities: auto` (the default) they appear from 2x zoom, or straight away when
+the query has no country-only series. Points with missing or invalid coordinates are never drawn;
+they are listed under the map as `Name (no coordinates)`.
+
+The plugin does not look up coordinates from a city name, so the data source has to provide them.
+For example, an exporter or recording rule that keeps a GeoIP city and its coordinates as labels:
+
+```promql
+sum by (city, country, latitude, longitude) (increase(http_requests_by_city_total[$__range]))
+```
+
+Put a country query and a city query in the same panel to get both layers. This query shape has not
+yet been tested against a real GeoIP data source.
+
+Known limits:
+
+- The shapes are countries only. Zooming in shows country borders and points, not regions or
+  streets.
+- A point just east of the antimeridian (for example Fiji at -179°) is drawn on the far west of the
+  map, while the island shapes around it are shifted east of 180°.
 
 ### Country names
 
@@ -67,7 +107,16 @@ plugin:
     min: 1                     # optional fixed bounds
     max: 100000
     showLegend: true
+    zoom: true                 # wheel, pinch and drag zoom, and the zoom buttons
+    clickToZoom: true          # click a country to zoom to it
+    cityLabel: city            # labels of series drawn as points
+    latitudeLabel: latitude
+    longitudeLabel: longitude
+    showCities: auto           # auto | always | never
 ```
+
+All fields except `calculation` are optional; the values above are the defaults, except `min`, `max`,
+`colorScheme` and `scale` (default `blues`, `linear`).
 
 The CUE schema is in `schemas/panels/geo-map-chart/`. A complete panel in a dashboard:
 

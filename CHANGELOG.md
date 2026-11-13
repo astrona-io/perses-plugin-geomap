@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Zoom and pan with the mouse wheel, a pinch or a drag (1x to 20x), and zoom in, zoom out and reset
+  buttons. New spec field `zoom` (default true).
+- Click a country to zoom to it; click it again, the sea or reset to zoom out. New spec field
+  `clickToZoom` (default true). Small far-away islands are left out of the zoom box.
+- Country names on the map from 2x zoom.
+- City layer: series with `latitude` and `longitude` labels are drawn as points sized and coloured by
+  value, named from 4x zoom. New spec fields `cityLabel`, `latitudeLabel`, `longitudeLabel` and
+  `showCities` (`auto`, `always`, `never`; default `auto`). Points with invalid coordinates are listed
+  under the map.
+- The view survives data refreshes and theme switches.
+
 ## [0.1.0] - 2026-11-13
 
 ### Added
@@ -22,4 +37,5 @@ All notable changes to this project are documented here. The format follows
 
 Tested with Perses v0.54.0.
 
+[Unreleased]: https://github.com/astrona-io/perses-plugin-geomap/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/astrona-io/perses-plugin-geomap/releases/tag/v0.1.0
