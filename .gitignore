@@ -20,3 +20,6 @@ dist/
 # external CUE dependencies
 /*/cue.mod/pkg/
 /cue.mod/pkg/
+
+# archive checksums written by the release workflow
+*.sha256
